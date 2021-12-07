@@ -1,0 +1,26 @@
+import { Box } from "grommet";
+
+import {
+  Features,
+  Footer,
+  NightCrawler,
+  Section,
+  Sign,
+  Talents,
+} from "../components/landing";
+
+const Landing = () => (
+  <>
+    <Box align="center" pad="large">
+      <NightCrawler size="xlarge" />
+      <Sign />
+      <Features />
+    </Box>
+    <Talents />
+    <Section>
+      <Footer />
+    </Section>
+  </>
+);
+
+export default Landing;
