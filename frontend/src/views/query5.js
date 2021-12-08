@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Box, Text, Heading, Stack, RangeSelector, Button } from "grommet";
+import {
+  Box,
+  Text,
+  Heading,
+  Stack,
+  RangeSelector,
+  Spinner,
+  Button,
+} from "grommet";
 import { Menu } from "grommet-icons";
 
 import { AppHeader } from "../components/dashboard";
@@ -8,10 +16,13 @@ import { axiosInstance } from "../apiClient/client";
 
 const Query5 = () => {
   const [range, setRange] = useState([2012, 2017]);
+  const [loader, setLoader] = useState(false);
   const [labels, setLabels] = useState();
   const [yaxisData, setYaxisData] = useState();
 
   const getData = (year_range) => {
+    setLoader(true);
+
     axiosInstance
       .post("/query5", {
         year_range: year_range,
@@ -22,6 +33,7 @@ const Query5 = () => {
         const yaxis = queryData.map((el) => el.maletofemaleratio);
         setLabels(labels);
         setYaxisData(yaxis);
+        setLoader(false);
       })
       .catch((err) => console.log(err));
   };
@@ -41,18 +53,31 @@ const Query5 = () => {
       <Box flex overflow="auto" gap="medium" pad="medium">
         <Box flex={false} direction="row-responsive" wrap>
           <Box gap="large" flex="grow" margin="medium">
-            {yaxisData && labels && (
-              <BarGraph
-                text="Find the growth in crime rate over num (defined by user) years till 2019"
-                labels={labels}
-                yaxisData={yaxisData}
-                xLabel="Year"
-                yLabel="Ration (per 100 males)"
-                ticks={{
-                  suggestedMin: 60,
-                  suggestedMax: 120,
-                }}
-              />
+            {loader ? (
+              <Box
+                round
+                pad="medium"
+                align="center"
+                background="white"
+                width="44rem"
+              >
+                <Spinner size="large" />
+              </Box>
+            ) : (
+              yaxisData &&
+              labels && (
+                <BarGraph
+                  text="Find the growth in crime rate over num (defined by user) years till 2019"
+                  labels={labels}
+                  yaxisData={yaxisData}
+                  xLabel="Year"
+                  yLabel="Ration (per 100 males)"
+                  ticks={{
+                    suggestedMin: 60,
+                    suggestedMax: 120,
+                  }}
+                />
+              )
             )}
           </Box>
           <Box flex="grow" margin="medium">

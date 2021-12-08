@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Heading, Select, Text } from "grommet";
+import { Box, Button, Heading, Select, Spinner } from "grommet";
 import { Menu } from "grommet-icons";
 
 import { AppHeader } from "../components/dashboard";
@@ -39,11 +39,13 @@ const getAreaCode = (areaName) => {
 const Query1 = () => {
   const [selected, setSelected] = useState("Central");
   const [labels, setLabels] = useState();
+  const [loader, setLoader] = useState(false);
   const [totalRows, setTotalRows] = useState();
   const [legends, setLegends] = useState();
   const [yaxisData, setYaxisData] = useState();
 
   const getData = (areaCode) => {
+    setLoader(true);
     axiosInstance
       .post("/query1", {
         area_code: areaCode,
@@ -57,6 +59,7 @@ const Query1 = () => {
         setLabels(labels);
         setLegends(crime_desc);
         setYaxisData(yaxisData);
+        setLoader(false);
       })
       .catch((err) => console.log(err));
   };
@@ -88,15 +91,28 @@ const Query1 = () => {
       <Box flex overflow="auto" gap="medium" pad="medium">
         <Box flex={false} direction="row-responsive" wrap>
           <Box gap="large" flex="grow" margin="medium">
-            {yaxisData && labels && (
-              <BarGraph
-                text="Find the crime against women which had the highest growth rate from the previous year in a particular district for every year"
-                labels={labels}
-                yaxisData={yaxisData}
-                legends={legends}
-                xLabel="Years"
-                yLabel="Growth Rate (%)"
-              />
+            {loader ? (
+              <Box
+                round
+                pad="medium"
+                align="center"
+                background="white"
+                width="44rem"
+              >
+                <Spinner size="large" />
+              </Box>
+            ) : (
+              yaxisData &&
+              labels && (
+                <BarGraph
+                  text="Find the crime against women which had the highest growth rate from the previous year in a particular district for every year"
+                  labels={labels}
+                  yaxisData={yaxisData}
+                  legends={legends}
+                  xLabel="Years"
+                  yLabel="Growth Rate (%)"
+                />
+              )
             )}
           </Box>
           <Box flex="grow" margin="medium">

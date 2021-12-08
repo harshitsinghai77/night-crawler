@@ -7,6 +7,7 @@ import {
   Stack,
   RangeSelector,
   Button,
+  Spinner,
 } from "grommet";
 import { Menu } from "grommet-icons";
 
@@ -17,10 +18,13 @@ import { axiosInstance } from "../apiClient/client";
 const Query4 = () => {
   const [range, setRange] = useState([30, 50]);
   const [selected, setSelected] = useState("2016");
+  const [loader, setLoader] = useState(false);
   const [labels, setLabels] = useState();
   const [yaxisData, setYaxisData] = useState();
 
   const getData = (age_range, year) => {
+    setLoader(true);
+
     axiosInstance
       .post("/query4", {
         age_range: age_range,
@@ -32,6 +36,7 @@ const Query4 = () => {
         const yaxis = queryData.map((el) => el.growth_percentage);
         setLabels(labels);
         setYaxisData(yaxis);
+        setLoader(false);
       })
       .catch((err) => console.log(err));
   };
@@ -52,14 +57,28 @@ const Query4 = () => {
       <Box flex overflow="auto" gap="medium" pad="medium">
         <Box flex={false} direction="row-responsive" wrap>
           <Box gap="large" flex="grow" margin="medium">
-            {yaxisData && labels && (
-              <BarGraph
-                text="Find the growth in crime rate over num (defined by user) years till 2019"
-                labels={labels}
-                yaxisData={yaxisData}
-                xLabel="District"
-                yLabel="Growth Rate (%)"
-              />
+            {loader ? (
+              <Box
+                round
+                pad="medium"
+                align="center"
+                background="white"
+                width="34rem"
+              >
+                <Spinner size="large" />
+              </Box>
+            ) : (
+              yaxisData &&
+              labels && (
+                <BarGraph
+                  text="Find the growth in crime rate over num (defined by user) years till 2019"
+                  labels={labels}
+                  yaxisData={yaxisData}
+                  width="34rem"
+                  xLabel="District"
+                  yLabel="Growth Rate (%)"
+                />
+              )
             )}
           </Box>
           <Box flex="grow" margin="medium">

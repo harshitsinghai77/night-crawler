@@ -9,9 +9,10 @@ const Graph1 = ({
   xLabel,
   yLabel,
   legends,
+  width = "40rem",
   ...rest
 }) => (
-  <Box round pad="medium" direction="column" background="white">
+  <Box round pad="medium" direction="column" background="white" width={width}>
     <Heading level="4" margin="none">
       {text}
     </Heading>

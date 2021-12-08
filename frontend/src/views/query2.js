@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Text, Heading, Select } from "grommet";
+import { Box, Text, Heading, Select, Spinner } from "grommet";
 import { Menu } from "grommet-icons";
 
 import { AppHeader } from "../components/dashboard";
@@ -32,6 +32,7 @@ const getBureau = (bureau) => {
 const Query1 = () => {
   const [selected1, setSelected1] = useState("Central");
   const [selected2, setSelected2] = useState("Central");
+  const [loader, setLoader] = useState(false);
   const [labels, setLabels] = useState();
   const [yaxisData1, setYaxisData1] = useState();
   const [yaxisData2, setYaxisData2] = useState();
@@ -45,6 +46,7 @@ const Query1 = () => {
 
   const onSelectBureau1 = async ({ option }) => {
     setSelected1(option);
+    setLoader(true);
     const bureau = getBureau(option);
     const resp = await getData(bureau);
     if (!resp) return;
@@ -53,9 +55,11 @@ const Query1 = () => {
     const yaxisData = queryData.map((el) => el.arrest_percentage);
     setLabels(labels);
     setYaxisData1(yaxisData);
+    setLoader(false);
   };
 
   const onSelectBureau2 = async ({ option }) => {
+    setLoader(true);
     setSelected2(option);
     const bureau = getBureau(option);
     const resp = await getData(bureau);
@@ -65,6 +69,7 @@ const Query1 = () => {
     const yaxisData = queryData.map((el) => el.arrest_percentage);
     setLabels(labels);
     setYaxisData2(yaxisData);
+    setLoader(false);
   };
 
   useEffect(() => {
@@ -78,18 +83,31 @@ const Query1 = () => {
       <Box flex overflow="auto" gap="medium" pad="medium">
         <Box flex={false} direction="row-responsive" wrap>
           <Box gap="large" flex="grow" margin="medium">
-            {yaxisData1 && labels && (
-              <LineGraph
-                text="Calculate the arrest percentage for crimes against women made by a particular Bureau for each year."
-                xLabel="Years"
-                yLabel="Arrest Percentage"
-                multiline={true}
-                labels={labels}
-                label1={selected1}
-                label2={selected2}
-                yaxisData1={yaxisData1}
-                yaxisData2={yaxisData2}
-              />
+            {loader ? (
+              <Box
+                round
+                pad="medium"
+                align="center"
+                background="white"
+                width="44rem"
+              >
+                <Spinner size="large" />
+              </Box>
+            ) : (
+              yaxisData1 &&
+              labels && (
+                <LineGraph
+                  text="Calculate the arrest percentage for crimes against women made by a particular Bureau for each year."
+                  xLabel="Years"
+                  yLabel="Arrest Percentage"
+                  multiline={true}
+                  labels={labels}
+                  label1={selected1}
+                  label2={selected2}
+                  yaxisData1={yaxisData1}
+                  yaxisData2={yaxisData2}
+                />
+              )
             )}
           </Box>
           <Box flex="grow" margin="medium">
