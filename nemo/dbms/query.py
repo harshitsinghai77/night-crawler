@@ -61,37 +61,46 @@ def query_1(query1_area_code):
 def query_2(query2_bureau):
     # query2_bureau = "('77th Street', 'Harbor', 'Southwest', 'Southeast')"
     query2 = f"""
-    WITH female_incidents AS 
-    (
-        SELECT *
-        FROM incidents i, victims v, district d
-        WHERE i.victim_id = v.victim_id AND i.area_code = d.area_code
-            AND d.area_name in {query2_bureau}
-            AND v.gender = 'F' AND EXTRACT(year from i.DATE_TIME) < 2020
-    )
-
-    SELECT arr.calender_year,
+    SELECT concat(arr.calender_year,'-Q',arr.calender_quarter) AS year_quarter, 
         ROUND((cast(arr.no_of_arrests as decimal) / inc.no_of_incidents) * 100, 2) AS Arrest_Percentage
-    FROM
+        FROM
         (
             SELECT 
-                EXTRACT(year from DATE_TIME) AS calender_year,
-
-                count(DISTINCT(DR_NO)) AS no_of_arrests
-            FROM female_incidents
+                EXTRACT(year from fe.DATE_TIME) AS calender_year,
+                EXTRACT(quarter from fe.DATE_TIME) AS calender_quarter,
+                count(DISTINCT(fe.DR_NO)) AS no_of_arrests
+            FROM (
+                    SELECT *
+                    FROM incidents i, victims v, district d
+                    WHERE i.victim_id = v.victim_id 
+                        AND i.area_code = d.area_code
+                        AND d.area_name in {query2_bureau} 
+                        AND v.gender = 'F' 
+                        AND EXTRACT(year from i.DATE_TIME) < 2020
+                ) fe
             WHERE status_code = 'AA' OR status_code = 'JA'
-            GROUP BY EXTRACT(year from DATE_TIME)
+            GROUP BY EXTRACT(year from DATE_TIME), EXTRACT(quarter from DATE_TIME)
             ORDER BY calender_year ASC
         ) arr,
         (
             SELECT 
                 EXTRACT(year from DATE_TIME) AS calender_year,
+                EXTRACT(quarter from DATE_TIME) AS calender_quarter,
                 count(DISTINCT(DR_NO)) AS no_of_incidents
-            FROM female_incidents
-            GROUP BY EXTRACT(year from DATE_TIME)
+            FROM (
+                    SELECT *
+                    FROM incidents i, victims v, district d
+                    WHERE i.victim_id = v.victim_id 
+                        AND i.area_code = d.area_code
+                        AND d.area_name in {query2_bureau} 
+                        AND v.gender = 'F' 
+                        AND EXTRACT(year from i.DATE_TIME) < 2020
+                ) fe
+            GROUP BY EXTRACT(year from DATE_TIME), EXTRACT(quarter from DATE_TIME)
             ORDER BY calender_year ASC
         ) inc
-    WHERE arr.calender_year = inc.calender_year
+    WHERE arr.calender_year = inc.calender_year 
+        AND arr.calender_quarter = inc.calender_quarter 
     """
     return query2
 

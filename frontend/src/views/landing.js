@@ -1,7 +1,6 @@
 import { Box } from "grommet";
 
 import {
-  Features,
   Footer,
   NightCrawler,
   Section,
@@ -14,7 +13,6 @@ const Landing = () => (
     <Box align="center" pad="large">
       <NightCrawler size="xlarge" />
       <Sign />
-      <Features />
     </Box>
     <Talents />
     <Section>

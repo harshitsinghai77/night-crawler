@@ -51,7 +51,7 @@ const Query1 = () => {
     const resp = await getData(bureau);
     if (!resp) return;
     const queryData = resp.data;
-    const labels = queryData.map((el) => el.calender_year);
+    const labels = queryData.map((el) => el.year_quarter);
     const yaxisData = queryData.map((el) => el.arrest_percentage);
     setLabels(labels);
     setYaxisData1(yaxisData);
@@ -65,7 +65,7 @@ const Query1 = () => {
     const resp = await getData(bureau);
     if (!resp) return;
     const queryData = resp.data;
-    const labels = queryData.map((el) => el.calender_year);
+    const labels = queryData.map((el) => el.year_quarter);
     const yaxisData = queryData.map((el) => el.arrest_percentage);
     setLabels(labels);
     setYaxisData2(yaxisData);
